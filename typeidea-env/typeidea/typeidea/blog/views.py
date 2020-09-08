@@ -1,29 +1,68 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponse
+from django.views.generic import DetailView, ListView
 
-from .models import Post, Tag
+from .models import Post, Tag, Category
+from config.models import SideBar
 
 # Create your views here.
 
 
-def post_list(request, category_id=None, tag_id=None):
-    if tag_id:
-        try:
-            tag = Tag.objects.get(id=tag_id)
-        except Tag.DoesNotExist:
-            post_list = []
-        else:
-            post_list = tag.post_set.filter(status=Post.STATUS_NORMAL)
-    else:
-        post_list = Post.objects.filter(status=Post.STATUS_NORMAL)
-        if category_id:
-            post_list = post_list.filter(category_id=category_id)
-    return render(request, 'blog/list.html', context={'post_list': post_list})
+class CommonViewMixin():
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'sidebars': SideBar.get_all(),
+        })
+        context.update(Category.get_navs())
+        return context
 
 
-def post_detail(request, post_id=None):
-    try:
-        post = Post.objects.get(id=post_id)
-    except Post.DoesNotExist:
-        post = None
-    return render(request, 'blog/detail.html', context={'post': post})
+class IndexView(ListView):
+    queryset = Post.latest_posts()
+    paginate_by = 5
+    context_object_name = 'post_list'
+    template_name = 'blog/list.html'
+
+
+class CategoryView(IndexView):
+    def get_context_data(self,  **kwargs):
+        context = super().get_context_data(**kwargs)
+        category_id = self.kwargs.get('category_id')
+        category = get_object_or_404(Category, pk=category_id)
+        context.update({
+            'category': category,
+        })
+        return context
+
+    def get_queryset(self):
+        """重写queryset,根据分类过滤"""
+        queryset = super().get_queryset()
+        category_id = self.kwargs.get('category_id')
+        return queryset.filter(category_id=category_id)
+
+
+class TagView(IndexView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag_id = self.kwargs.get('tag_id')
+        tag = get_object_or_404(Tag, pk=tag_id)
+        context.update({
+            'tag': tag,
+        })
+        return context
+
+    def get_queryset(self):
+        """重写queryset,根据分类过滤"""
+        queryset = super().get_queryset()
+        tag_id = self.kwargs.get('tag_id')
+        return queryset.filter(tag_id=tag_id)
+
+
+class PostDetailView(CommonViewMixin, DetailView):
+    queryset = Post.latest_posts()
+    template_name = 'blog/detail.html'
+    context_object_name = 'post'
+    pk_url_kwarg = 'post_id'
+
