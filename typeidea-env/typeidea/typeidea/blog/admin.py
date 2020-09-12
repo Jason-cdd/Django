@@ -1,6 +1,9 @@
+from __future__ import unicode_literals
+
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from django.contrib.admin.models import LogEntry
 
 from .models import Post, Category, Tag
 from .adminforms import PostAdminForm
@@ -25,7 +28,7 @@ class CategoryAdmin(BaseOwnerAdmin):
     def post_count(self, obj):
         return obj.post_set.count()
     post_count.short_description = '文章数量'
-    #
+
     # def save_model(self, request, obj, form, change):
     #     obj.owner = request.user
     #     return super(CategoryAdmin, self).save_model(request, obj, form, change)
@@ -52,7 +55,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         category_id = self.value()
         if category_id:
-            return queryset.filter(category_id=category_id)
+            return queryset.filter(category_id=self.value())
         return queryset
 
 
@@ -70,7 +73,7 @@ class PostAdmin(BaseOwnerAdmin):
     actions_on_bottom = True
 
     # 编辑页面
-    exclude = ['owner', ]
+    exclude = ['owner']
     # fields = (('category', 'title'), 'desc', 'status', 'content', 'tag')
     fieldsets = (
         ('基础配置', {
@@ -87,7 +90,7 @@ class PostAdmin(BaseOwnerAdmin):
             ),
         }),
         ('额外信息', {
-            'classes': ('collapse', ),
+            'classes': ('wide', ),
             'fields': ('tag', ),
         })
     )
@@ -100,7 +103,7 @@ class PostAdmin(BaseOwnerAdmin):
     # def save_model(self, request, obj, form, change):
     #     obj.owner = request.user
     #     return super(PostAdmin, self).save_model(request, obj, form, change)
-
+    #
     # def get_queryset(self, request):
     #     qs = super(PostAdmin, self).get_queryset(request)
     #     return qs.filter(owner=request.user)
@@ -110,3 +113,8 @@ class PostAdmin(BaseOwnerAdmin):
             'all': ("https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css", ),
         }
         js = ('https://cdn.bootcss.com/bootstrap/4.0.0-beta.2/js/bootstrap.bundle.js', )
+
+
+@admin.register(LogEntry, site=custom_site)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ['object_repr', 'object_id', 'action_flag', 'user', 'change_message']

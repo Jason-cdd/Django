@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.template.loader import render_to_string
@@ -16,11 +18,15 @@ class Link(models.Model):
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEMS, verbose_name="状态")
     weight = models.PositiveIntegerField(default=1, choices=zip(range(1, 6), range(1, 6)), verbose_name="权重",
                                           help_text='权重高展示顺序考前')
-    owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.DO_NOTHING)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
         verbose_name = verbose_name_plural = "友链"
+        ordering = ['-weight', ]
+
+    def __str__(self):
+        return self.title
 
 
 class SideBar(models.Model):
@@ -56,6 +62,12 @@ class SideBar(models.Model):
     class Meta:
         verbose_name = verbose_name_plural = "侧边栏"
 
+    def __str__(self):
+        return self.title
+
+    def _render_latest(self):
+        pass
+
     @classmethod
     def get_all(cls):
         return cls.objects.filter(status=cls.STATUS_SHOW)
@@ -76,12 +88,13 @@ class SideBar(models.Model):
             result = render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_HOT:
             context = {
-                'posts': Post.hot_post()
+                'posts': Post.hot_posts()
             }
             result = render_to_string('config/blocks/sidebar_posts.html', context)
         elif self.display_type == self.DISPLAY_COMMENT:
             context = {
-                'comments': Comment.objects.filter(status=Comment.STATUS_NORMAL)
+                'comments': Comment.objects.filter(status=Comment.STATUS_NORMAL)[:10]
             }
             result = render_to_string('config/blocks/sidebar_comments.html', context)
+        return result
 

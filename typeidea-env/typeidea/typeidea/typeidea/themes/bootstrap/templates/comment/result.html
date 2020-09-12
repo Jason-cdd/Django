@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>评论结果页</title>
+        <title>评论结果页 - typeidea</title>
         <style>
             body {TEXT-ALIGN: center;}.result {
             text-aligh: center;
@@ -10,7 +10,7 @@
             }
             .errorlist {color: red;}
             ul li {
-            list-style-type: None;
+                list-style-type: None;
             }
         </style>
     </head>
@@ -23,7 +23,7 @@
             {% else %}
                 <ul class="errorlist">
                     {% for field, message in form.errors.items %}
-                    <li>{{ message }}</li>
+                        <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
                 <a href="javascript:window.history.back();">返回</a>

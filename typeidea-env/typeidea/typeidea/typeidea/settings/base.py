@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -31,10 +32,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # 'xadmin',
+    # 'crispy_forms',
     'typeidea',
     'blog',
     'config',
     'comment',
+    'bootstrap3',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 我的设置
+    'blog.middleware.user_id.UserIDMiddleware',
 ]
 
 ROOT_URLCONF = 'typeidea.urls'
@@ -76,6 +82,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'typeidea.wsgi.application'
 
+# Database
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 
 
@@ -120,6 +135,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'themes', THEME, 'static'),
 ]
 
-STATIC_ROOT = '/tmp/static'
+# STATIC_ROOT = '/tmp/static'
+#
+BOOTSTRAP3 = {
+    'include_jquery': True
+}
 
 

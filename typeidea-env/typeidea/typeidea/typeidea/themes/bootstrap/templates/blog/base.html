@@ -1,14 +1,26 @@
-{% load static %}
+<!--{% load static %}-->
+{% load bootstrap3 %}
+
 <!DOCTYPE HTML>
 <html lang="en">
     <head>
         <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>{% block title %}首页{% endblock %}- typeidea博客系统</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <style>
-            .post { margin-bottom: 5px; }  // 配置每个post下面的间隔
-        </style>
+
+<!--        {% bootstrap_css %}-->
+<!--        {% bootstrap_javascript %}-->
+
+        {% block extra_head %}
+        {% endblock %}
+        <link rel="stylesheet" href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css">
+        <script src="http://cdn.bootcss.com/highlight.js/8.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
+        <style>.post { margin-bottom: 5px; }</style>
+        <style>.sidebar { margin-bottom: 5px; }</style>
     </head>
 
     <body>
@@ -40,19 +52,24 @@
             <div class="row">
                 <div class="col-9 post-list">
                     {% block main %}
-                    {% endblock %}
+                    {% endblock main %}
                 </div>
                 <div class="col-3">
                     {% block sidebar %}
                         {% for sidebar in sidebars %}
                             <div class="card sidebar">
                                 <div class="card-body">
-                                    <h4 class="card-title">{{ sidebar.title }}</h4>
-                                    <p>{{ sidebar.content_html }}</p>
+                                    <h5 class="card-title">{{ sidebar.title }}</h5>
+                                    <p>
+                                    {{ sidebar.content_html }}
+                                    </p>
                                 </div>
                             </div>
+                        {% empty %}
+                            <a>NO sidebar have been added yet!</a>
                         {% endfor %}
-                    {% endblock %}
+
+                    {% endblock sidebar %}
                 </div>
             </div>
         </div>
