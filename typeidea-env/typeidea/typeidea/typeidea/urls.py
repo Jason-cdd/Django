@@ -17,7 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
 from django.contrib.sitemaps import views as sitemap_views
+from django.conf.urls.static import static
+from django.conf import settings
 import xadmin
+from rest_framework.documentation import include_docs_urls
+from rest_framework.routers import DefaultRouter
 
 from .custom_site import custom_site
 from blog.views import PostDetailView, IndexView, CategoryView, TagView, SearchView, AuthorView
@@ -25,7 +29,12 @@ from config.views import LinkListView
 from comment.views import CommentView
 from blog.rss import LatestPostFeed
 from blog.sitemap import PostSitemap
+from blog.apis import PostViewSet, CategoryViewSet
 from .autocomplete import CategoryAutocomplete, TagAutocomplete
+
+router = DefaultRouter()
+router.register(r'post', PostViewSet, base_name='api-post')
+router.register(r'category', CategoryViewSet, base_name='api-category')
 
 urlpatterns = [
     url(r'^admin/', xadmin.site.urls, name='xadmin'),
@@ -43,4 +52,30 @@ urlpatterns = [
     url(r'^category-autocomplete/$', CategoryAutocomplete.as_view(), name='category-autocomplete'),
     url(r'^tag-autocomplete/$', TagAutocomplete.as_view(), name='tag-autocomplete'),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-]
+    url(r'^api/', include(router.urls)),
+    url(r'^api/docs/', include_docs_urls(title='typeidea apis')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# if settings.DEBUG:
+#     import debug_toolbar
+#     urlpatterns = [
+#         url(r'^__debug__/', include(debug_toolbar.urls)),
+#     ] + urlpatterns
+
+
+if settings.DEBUG:
+    # static and media
+    from django.conf.urls.static import static
+    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+    urlpatterns.extend(
+        staticfiles_urlpatterns()
+        + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    )
+
+    # debug toolbar
+    import debug_toolbar
+
+    urlpatterns.insert(0, path("__debug__/", include(debug_toolbar.urls)))
+    urlpatterns += [url(r'^silk/', include('silk.urls', namespace='silk'))]

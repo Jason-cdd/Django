@@ -18,7 +18,6 @@ import sys
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -55,6 +54,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'ckeditor',
     'ckeditor_uploader',
+    'rest_framework',
 
 ]
 
@@ -152,7 +152,7 @@ BOOTSTRAP3 = {
 }
 
 XADMIN_TITLE = 'Typeidea 管理后台'
-XADMIN_FOOTER_TITLE = 'power by the5fire.com'
+XADMIN_FOOTER_TITLE = 'power by Jason-cdd'
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -170,4 +170,7 @@ CKEDITOR_UPLOAD_PATH = "article_images"
 
 DEFAULT_FILE_STORAGE = 'typeidea.storage.WatermarkStorage'
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2,
+}
